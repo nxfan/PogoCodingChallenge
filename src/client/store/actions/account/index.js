@@ -17,10 +17,17 @@ export const getTransactions = () => dispatch => {
       accounts.forEach(account => {
         transactions = transactions.concat(account.transactions);
       });
-      
+
+      let transactionsToClaim = []
+      const nonValidCategory = ['Bank Fees', 'Interest', 'Transfer', 'Taxes', 'Payment'];
+      transactionsToClaim = transactions.filter(transaction => {
+        const intersection = transaction.category.filter(category => nonValidCategory.includes(category));
+        return intersection.length === 0 && transaction.amount > 0
+      });
+
       dispatch({
         type: GET_TRANSACTIONS,
-        payload: transactions,
+        payload: {transactionsToClaim, transactions},
       })
     })
     .catch(() =>

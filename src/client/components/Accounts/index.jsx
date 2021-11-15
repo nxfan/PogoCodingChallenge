@@ -2,12 +2,16 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import MaterialTable from 'material-table'; // https://mbrn.github.io/material-table/#/
+import List from "@material-ui/core/List";
+import PurchasesToClaim from "../PurchasesToClaim";
+import PurchasesClaimed from "../PurchasesClaimed";
 
 import {
   getTransactions,
   addAccount,
   deleteAccount,
 } from '../../store/actions/account';
+import { claimPurchase } from '../../store/actions/purchasesToClaim'
 import { logoutUser } from '../../store/actions/auth';
 
 class Accounts extends Component {
@@ -45,8 +49,7 @@ class Accounts extends Component {
   };
 
   render() {
-    const { user, accounts, transactions } = this.props;
-
+    const { user, accounts, transactions, transactionsToClaim, totalPoints, transactionsClaimed } = this.props;
     const accountItems = accounts.map(account => (
       <li key={account._id} style={{ marginTop: '1rem' }}>
         <button
@@ -98,7 +101,7 @@ class Accounts extends Component {
             </p>
             <hr style={{ marginTop: '2rem', opacity: '.2' }} />
             <h5>
-              <b>Points: XYZ</b>
+              <b>Points: {totalPoints}</b>
             </h5>
             <h5>
               <b>Linked Accounts</b>
@@ -135,6 +138,19 @@ class Accounts extends Component {
             <h5>
               <b>Purchases to Claim</b>
             </h5>
+            <React.Fragment>
+              <List>
+                <PurchasesToClaim {...this.props}/>
+              </List>
+            </React.Fragment>
+            <h5>
+              <b>Purchases Claimed</b>
+            </h5>
+            <React.Fragment>
+              <List>
+                <PurchasesClaimed {...this.props}/>
+              </List>
+            </React.Fragment>
           </div>
         </div>
     );
@@ -149,15 +165,21 @@ Accounts.propTypes = {
   accounts: PropTypes.array.isRequired,
   plaid: PropTypes.object.isRequired,
   transactions: PropTypes.array.isRequired,
+  transactionsToClaim: PropTypes.array,
+  transactionsClaimed: PropTypes.array,
+  totalPoints: PropTypes.number.isRequired,
   user: PropTypes.object.isRequired,
 };
 
 const mapStateToProps = state => ({
   plaid: state.plaid,
-  transactions: state.plaid.transactions
+  transactions: state.plaid.transactions,
+  transactionsToClaim: state.plaid.transactionsToClaim,
+  transactionsClaimed: state.plaid.transactionsClaimed,
+  totalPoints: state.plaid.totalPoints,
 });
 
 export default connect(
   mapStateToProps,
-  { logoutUser, getTransactions, addAccount, deleteAccount }
+  { logoutUser, getTransactions, addAccount, deleteAccount, claimPurchase }
 )(Accounts);
